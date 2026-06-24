@@ -164,11 +164,11 @@
     font-size:15px;
     font-weight:600;
     padding:0;
+    cursor:default;
+    caret-color:transparent;
   }
   .score-pair input:focus{
     outline:none;
-    border-color:var(--grass-light);
-    box-shadow:0 0 0 2px rgba(108,203,108,0.25);
   }
   .score-pair span{color:var(--text-faint); font-size:13px;}
 
@@ -423,9 +423,9 @@ MATCHES.forEach((m, idx) => {
       <span class="m-num">${m.n}</span>
       <span class="m-team ${m.special?'special':''}">${m.t1}</span>
       <span class="score-pair">
-        <input type="number" min="0" max="20" id="s1-${m.n}" data-n="${m.n}" data-side="1">
+        <input type="number" min="0" max="20" id="s1-${m.n}" data-n="${m.n}" data-side="1" readonly tabindex="-1">
         <span>—</span>
-        <input type="number" min="0" max="20" id="s2-${m.n}" data-n="${m.n}" data-side="2">
+        <input type="number" min="0" max="20" id="s2-${m.n}" data-n="${m.n}" data-side="2" readonly tabindex="-1">
       </span>
       <span class="m-team right ${m.special?'special':''}">${m.t2}</span>
     </div>`;
@@ -532,7 +532,6 @@ function renderDetail(name, results){
     </div>`;
 }
 
-document.getElementById("match-rows").addEventListener("input", computeAll);
 document.getElementById("detail-select").addEventListener("change", (e)=>{
   renderDetail(e.target.value, computeAll());
 });
