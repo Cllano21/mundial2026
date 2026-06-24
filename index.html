@@ -556,6 +556,10 @@ document.getElementById("btn-clear").addEventListener("click", ()=>{
   computeAll();
 });
 
+Object.entries(CONFIRMED).forEach(([n, score])=>{
+  document.getElementById(`s1-${n}`).value = score[0];
+  document.getElementById(`s2-${n}`).value = score[1];
+});
 computeAll();
 </script>
 </body>
