@@ -1,269 +1,562 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evaluador de Polla - Fecha 3</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f1f5f9;
-            margin: 0;
-            padding: 20px;
-            color: #1e293b;
-        }
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-        h1 {
-            text-align: center;
-            color: #0f172a;
-            margin-bottom: 5px;
-        }
-        .header-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 20px;
-            margin-top: 20px;
-            margin-bottom: 25px;
-        }
-        .card {
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
-            padding: 15px;
-            border-radius: 8px;
-        }
-        .card h3 { margin-top: 0; color: #334155; border-bottom: 2px solid #cbd5e1; padding-bottom: 5px; }
-        .flex-input { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
-        .flex-input input { padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.95rem; }
-        
-        .score-box { background: linear-gradient(135deg, #0f172a, #1e293b); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 8px; text-align: center; }
-        .score-box span { font-size: 2.5rem; font-weight: bold; color: #fde047; }
+<meta charset="UTF-8">
+<title>Quiniela Fecha 3 — Resultados y Tabla</title>
+<style>
+  :root{
+    --bg:#0E1A14;
+    --panel:#142A1F;
+    --panel2:#0F231A;
+    --line:#24402F;
+    --line-soft:#1B3527;
+    --grass:#3FA34D;
+    --grass-light:#6CCB6C;
+    --gold:#E0B23B;
+    --gold-soft:#F3D98A;
+    --text:#EAF3E8;
+    --text-dim:#9AB39E;
+    --text-faint:#5E7A66;
+    --red:#D2574A;
+    --font-display:"Oswald","Arial Narrow",sans-serif;
+    --font-body:"Inter",system-ui,-apple-system,sans-serif;
+    --font-mono:"JetBrains Mono",monospace;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 50% 0%, #143524 0%, var(--bg) 60%);
+    color:var(--text);
+    font-family:var(--font-body);
+    padding-bottom:80px;
+  }
+  .field-lines{
+    position:fixed; inset:0; z-index:0; pointer-events:none; opacity:0.05;
+    background-image:
+      repeating-linear-gradient(0deg, transparent 0 78px, #fff 78px 80px);
+  }
+  header{
+    position:relative; z-index:1;
+    padding:36px 24px 22px;
+    text-align:center;
+    border-bottom:2px solid var(--line);
+  }
+  .kicker{
+    font-family:var(--font-mono);
+    font-size:12px;
+    letter-spacing:3px;
+    color:var(--gold-soft);
+    text-transform:uppercase;
+    margin:0 0 10px;
+  }
+  h1{
+    font-family:var(--font-display);
+    font-size:clamp(28px,5vw,44px);
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin:0;
+    color:#fff;
+  }
+  h1 span{color:var(--grass-light);}
+  .subtitle{
+    color:var(--text-dim);
+    font-size:14px;
+    margin:10px 0 0;
+  }
+  main{
+    position:relative; z-index:1;
+    max-width:1180px;
+    margin:0 auto;
+    padding:28px 18px 0;
+    display:grid;
+    grid-template-columns: 1fr;
+    gap:28px;
+  }
+  @media(min-width:980px){
+    main{grid-template-columns: 1.55fr 1fr; align-items:start;}
+  }
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    overflow:hidden;
+  }
+  .panel-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 20px;
+    border-bottom:1px solid var(--line);
+    background:var(--panel2);
+  }
+  .panel-head h2{
+    font-family:var(--font-display);
+    text-transform:uppercase;
+    letter-spacing:1px;
+    font-size:18px;
+    margin:0;
+    color:#fff;
+  }
+  .panel-head .hint{
+    font-size:12px;
+    color:var(--text-faint);
+  }
+  .progress-pill{
+    font-family:var(--font-mono);
+    font-size:12px;
+    background:rgba(63,163,77,0.15);
+    border:1px solid var(--grass);
+    color:var(--grass-light);
+    padding:4px 10px;
+    border-radius:20px;
+    white-space:nowrap;
+  }
+  .progress-pill.done{
+    background:rgba(224,178,59,0.15);
+    border-color:var(--gold);
+    color:var(--gold-soft);
+  }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            font-size: 0.9rem;
-        }
-        th {
-            background-color: #1e293b;
-            color: white;
-            padding: 12px 8px;
-        }
-        td {
-            padding: 10px 8px;
-            border-bottom: 1px solid #e2e8f0;
-            text-align: center;
-        }
-        tr:hover { background-color: #f8fafc; }
-        
-        .btn-toggle {
-            border: 1px solid #cbd5e1;
-            background-color: white;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-        .btn-toggle.active {
-            background-color: #3b82f6;
-            color: white;
-            border-color: #3b82f6;
-        }
-        .input-marcador {
-            width: 40px;
-            text-align: center;
-            padding: 4px;
-            border: 1px solid #cbd5e1;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-        .input-real {
-            background-color: #fef08a;
-            border: 1px solid #eab308;
-        }
-        .badge-puntos {
-            background-color: #dcfce7;
-            color: #166534;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-weight: bold;
-        }
-        .vs { font-size: 0.8rem; font-weight: bold; color: #64748b; }
-    </style>
+  .match-rows{padding:6px 0;}
+  .group-divider{
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:2px;
+    color:var(--text-faint);
+    text-transform:uppercase;
+    padding:14px 20px 6px;
+  }
+  .match-row{
+    display:grid;
+    grid-template-columns: 28px 1fr 96px 1fr;
+    align-items:center;
+    gap:10px;
+    padding:9px 20px;
+    border-top:1px solid var(--line-soft);
+  }
+  .match-row:first-child{border-top:none;}
+  .match-row.entered{background:rgba(63,163,77,0.06);}
+  .m-num{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--text-faint);
+  }
+  .m-team{
+    font-size:14.5px;
+    color:var(--text);
+  }
+  .m-team.right{text-align:right;}
+  .m-team.special{color:var(--gold-soft); font-weight:600;}
+  .score-pair{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+  }
+  .score-pair input{
+    width:38px;
+    height:34px;
+    text-align:center;
+    background:var(--panel2);
+    border:1px solid var(--line);
+    border-radius:4px;
+    color:#fff;
+    font-family:var(--font-mono);
+    font-size:15px;
+    font-weight:600;
+    padding:0;
+  }
+  .score-pair input:focus{
+    outline:none;
+    border-color:var(--grass-light);
+    box-shadow:0 0 0 2px rgba(108,203,108,0.25);
+  }
+  .score-pair span{color:var(--text-faint); font-size:13px;}
+
+  .actions-row{
+    display:flex; gap:10px; padding:16px 20px; border-top:1px solid var(--line);
+    flex-wrap:wrap;
+  }
+  button{
+    font-family:var(--font-body);
+    font-size:13px;
+    font-weight:600;
+    border-radius:5px;
+    padding:10px 16px;
+    cursor:pointer;
+    border:1px solid var(--line);
+    background:var(--panel2);
+    color:var(--text);
+    transition:transform .08s ease, background .15s ease;
+  }
+  button:hover{background:#163524;}
+  button:active{transform:scale(0.97);}
+  button.primary{
+    background:var(--grass);
+    border-color:var(--grass);
+    color:#0E1A14;
+  }
+  button.primary:hover{background:var(--grass-light);}
+  button.ghost{color:var(--text-dim);}
+
+  .standings-list{padding:6px 0;}
+  .standing-row{
+    display:grid;
+    grid-template-columns: 34px 1fr 50px 50px 56px;
+    align-items:center;
+    gap:8px;
+    padding:11px 20px;
+    border-top:1px solid var(--line-soft);
+  }
+  .standing-row:first-child{border-top:none;}
+  .standing-row.top1{background:linear-gradient(90deg, rgba(224,178,59,0.14), transparent);}
+  .standing-row.top2{background:linear-gradient(90deg, rgba(224,178,59,0.07), transparent);}
+  .standing-row.top3{background:linear-gradient(90deg, rgba(224,178,59,0.04), transparent);}
+  .rank{
+    font-family:var(--font-display);
+    font-size:18px;
+    color:var(--text-faint);
+    text-align:center;
+  }
+  .top1 .rank{color:var(--gold);}
+  .top2 .rank{color:#C9CFC9;}
+  .top3 .rank{color:#B0805A;}
+  .pname{
+    font-size:14px;
+    color:var(--text);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .col-label{
+    font-family:var(--font-mono);
+    font-size:10px;
+    color:var(--text-faint);
+    text-align:center;
+    letter-spacing:1px;
+  }
+  .pts-mini{
+    font-family:var(--font-mono);
+    font-size:13px;
+    color:var(--text-dim);
+    text-align:center;
+  }
+  .pts-total{
+    font-family:var(--font-display);
+    font-size:18px;
+    color:var(--grass-light);
+    text-align:center;
+  }
+  .top1 .pts-total{color:var(--gold-soft);}
+
+  .legend-note{
+    padding:14px 20px;
+    font-size:12px;
+    color:var(--text-faint);
+    border-top:1px solid var(--line);
+    line-height:1.6;
+  }
+  .legend-note b{color:var(--text-dim);}
+
+  .detail-panel{margin-top:18px;}
+  .detail-panel .panel-head h2{font-size:15px;}
+  .detail-table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  .detail-table th{
+    font-family:var(--font-mono);
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:var(--text-faint);
+    text-align:left;
+    padding:8px 10px;
+    border-bottom:1px solid var(--line);
+    position:sticky; top:0; background:var(--panel);
+  }
+  .detail-table td{
+    padding:7px 10px;
+    border-bottom:1px solid var(--line-soft);
+    color:var(--text-dim);
+    white-space:nowrap;
+  }
+  .detail-table td.ok{color:var(--grass-light);}
+  .detail-scroll{max-height:340px; overflow:auto;}
+  select{
+    font-family:var(--font-body);
+    font-size:13px;
+    background:var(--panel2);
+    color:var(--text);
+    border:1px solid var(--line);
+    border-radius:5px;
+    padding:8px 10px;
+  }
+
+  .empty-detail{
+    padding:30px 20px;
+    text-align:center;
+    color:var(--text-faint);
+    font-size:13px;
+  }
+
+  ::-webkit-scrollbar{width:8px; height:8px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:var(--line); border-radius:4px;}
+</style>
 </head>
 <body>
 
-<div class="container">
-    <h1>📊 Sistema Calificador de Pronósticos - Fecha 3</h1>
-    
-    <div class="header-grid">
-        <div class="card">
-            <h3>👤 Datos del Participante</h3>
-            <div class="flex-input">
-                <label style="font-weight: bold; width: 150px;">Nombre Completo:</label>
-                <input type="text" id="nombre-participante" placeholder="Ej. Joel Andrade" style="flex: 1;">
-            </div>
-            <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: #64748b;">
-                💡 <b>Regla:</b> 1 Pnt por acertar resultado general (L/E/V) + 1 Pnt por acertar marcador exacto.
-            </p>
-        </div>
+<div class="field-lines"></div>
 
-        <div class="score-box">
-            Total Calificación
-            <span id="score-total">0 / 48 Pts</span>
-        </div>
+<header>
+  <p class="kicker">Mundial 2026 · Fecha 3</p>
+  <h1>Quiniela <span>Casa para Todos</span></h1>
+  <p class="subtitle">Ingresa los resultados reales de los 24 partidos y la tabla se calcula sola</p>
+</header>
+
+<main>
+  <section class="panel" id="matches-panel">
+    <div class="panel-head">
+      <h2>Resultados reales</h2>
+      <span class="progress-pill" id="progress-pill">0 / 24 ingresados</span>
     </div>
+    <div class="match-rows" id="match-rows"></div>
+    <div class="actions-row">
+      <button class="primary" id="btn-demo">Cargar los 2 resultados confirmados</button>
+      <button class="ghost" id="btn-clear">Limpiar todo</button>
+    </div>
+    <div class="legend-note">
+      <b>Puntaje:</b> 1 punto por acertar Gana/Empata/Gana (resultado general) + 1 punto por acertar el marcador exacto. Máximo 2 puntos por partido, 48 en total.
+    </div>
+  </section>
 
-    <table>
-        <thead>
-            <tr>
-                <th>N°</th>
-                <th>Grupo</th>
-                <th>Partido</th>
-                <th>Resultado Real del Partido</th>
-                <th>Pronóstico de la Persona</th>
-                <th>Marcador de la Persona</th>
-                <th>Puntos</th>
-            </tr>
-        </thead>
-        <tbody id="tabla-evaluacion">
-            </tbody>
-    </table>
-</div>
+  <div>
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Tabla de posiciones</h2>
+        <span class="hint" id="standings-hint">esperando resultados</span>
+      </div>
+      <div class="standing-row" style="border-top:none; padding-top:10px; padding-bottom:10px;">
+        <span></span>
+        <span class="col-label">participante</span>
+        <span class="col-label">gana/emp</span>
+        <span class="col-label">marcador</span>
+        <span class="col-label">total</span>
+      </div>
+      <div class="standings-list" id="standings-list"></div>
+    </section>
+
+    <section class="panel detail-panel">
+      <div class="panel-head">
+        <h2>Detalle por participante</h2>
+        <select id="detail-select"><option value="">Selecciona...</option></select>
+      </div>
+      <div id="detail-body">
+        <div class="empty-detail">Elige un participante para ver partido por partido</div>
+      </div>
+    </section>
+  </div>
+</main>
 
 <script>
-    // Estructura oficial de partidos de la Fecha 3 (con los dos primeros ya ingresados por defecto)
-    const partidos = [
-        { n: 49, grupo: "Grupo B", eq1: "Suiza", eq2: "Canadá", r1: 2, r2: 1 },
-        { n: 50, grupo: "Grupo B", eq1: "Bosnia y Herzeg", eq2: "Qatar", r1: 3, r2: 1 },
-        { n: 51, grupo: "Grupo C", eq1: "Marruecos", eq2: "Haití", r1: "", r2: "" },
-        { n: 52, grupo: "Grupo C", eq1: "Escocia", eq2: "Brasil", r1: "", r2: "" },
-        { n: 53, grupo: "Grupo A", eq1: "México", eq2: "Rep. Checa", r1: "", r2: "" },
-        { n: 54, grupo: "Grupo A", eq1: "Sudáfrica", eq2: "Corea del Sur", r1: "", r2: "" },
-        { n: 55, grupo: "Grupo F", eq1: "Japón", eq2: "Suecia", r1: "", r2: "" },
-        { n: 56, grupo: "Grupo F", eq1: "Túnez", eq2: "Países Bajos", r1: "", r2: "" },
-        { n: 57, grupo: "Grupo E", eq1: "ECUADOR", eq2: "Alemania", r1: "", r2: "" },
-        { n: 58, grupo: "Grupo E", eq1: "Curazao", eq2: "Costa de Marfil", r1: "", r2: "" },
-        { n: 59, grupo: "Grupo D", eq1: "Estados Unidos", eq2: "Turquía", r1: "", r2: "" },
-        { n: 60, grupo: "Grupo D", eq1: "Paraguay", eq2: "Australia", r1: "", r2: "" },
-        { n: 61, grupo: "Grupo I", eq1: "Noruega", eq2: "Francia", r1: "", r2: "" },
-        { n: 62, grupo: "Grupo I", eq1: "Senegal", eq2: "Irak", r1: "", r2: "" },
-        { n: 63, grupo: "Grupo H", eq1: "Uruguay", eq2: "España", r1: "", r2: "" },
-        { n: 64, grupo: "Grupo H", eq1: "Cabo Verde", eq2: "Arabia Saudita", r1: "", r2: "" },
-        { n: 65, grupo: "Grupo G", eq1: "Nueva Zelanda", eq2: "Bélgica", r1: "", r2: "" },
-        { n: 66, grupo: "Grupo G", eq1: "Egipto", eq2: "Irán", r1: "", r2: "" },
-        { n: 67, grupo: "Grupo J", eq1: "Argelia", eq2: "Austria", r1: "", r2: "" },
-        { n: 68, grupo: "Grupo J", eq1: "Jordania", eq2: "Argentina", r1: "", r2: "" },
-        { n: 69, grupo: "Grupo L", eq1: "Panamá", eq2: "Inglaterra", r1: "", r2: "" },
-        { n: 70, grupo: "Grupo L", eq1: "Croacia", eq2: "Ghana", r1: "", r2: "" },
-        { n: 71, grupo: "Grupo K", eq1: "Colombia", eq2: "Portugal", r1: "", r2: "" },
-        { n: 72, grupo: "Grupo K", eq1: "RD Congo", eq2: "Uzbekistán", r1: "", r2: "" }
-    ];
+const MATCHES = [
+  {n:49, group:"Grupo B", t1:"Suiza", t2:"Canadá"},
+  {n:50, group:"Grupo B", t1:"Bosnia y Herzeg.", t2:"Qatar"},
+  {n:51, group:"Grupo C", t1:"Marruecos", t2:"Haití"},
+  {n:52, group:"Grupo C", t1:"Escocia", t2:"Brasil"},
+  {n:53, group:"Grupo A", t1:"México", t2:"Rep. Checa"},
+  {n:54, group:"Grupo A", t1:"Sudáfrica", t2:"Corea del Sur"},
+  {n:55, group:"Grupo F", t1:"Japón", t2:"Suecia"},
+  {n:56, group:"Grupo F", t1:"Túnez", t2:"Países Bajos"},
+  {n:57, group:"Grupo E", t1:"ECUADOR", t2:"Alemania", special:true},
+  {n:58, group:"Grupo E", t1:"Curazao", t2:"Costa de Marfil"},
+  {n:59, group:"Grupo D", t1:"Estados Unidos", t2:"Turquía"},
+  {n:60, group:"Grupo D", t1:"Paraguay", t2:"Australia"},
+  {n:61, group:"Grupo I", t1:"Noruega", t2:"Francia"},
+  {n:62, group:"Grupo I", t1:"Senegal", t2:"Irak"},
+  {n:63, group:"Grupo H", t1:"Uruguay", t2:"España"},
+  {n:64, group:"Grupo H", t1:"Cabo Verde", t2:"Arabia Saudita"},
+  {n:65, group:"Grupo G", t1:"Nueva Zelanda", t2:"Bélgica"},
+  {n:66, group:"Grupo G", t1:"Egipto", t2:"Irán"},
+  {n:67, group:"Grupo J", t1:"Argelia", t2:"Austria"},
+  {n:68, group:"Grupo J", t1:"Jordania", t2:"Argentina"},
+  {n:69, group:"Grupo L", t1:"Panamá", t2:"Inglaterra"},
+  {n:70, group:"Grupo L", t1:"Croacia", t2:"Ghana"},
+  {n:71, group:"Grupo K", t1:"Colombia", t2:"Portugal"},
+  {n:72, group:"Grupo K", t1:"RD Congo", t2:"Uzbekistán"},
+];
 
-    const registroEvaluacion = {};
+const CONFIRMED = { 49:[2,1], 50:[3,1] };
 
-    function construirTabla() {
-        const tbody = document.getElementById('tabla-evaluacion');
-        
-        partidos.forEach(p => {
-            registroEvaluacion[p.n] = { real1: p.r1, real2: p.r2, pPronostico: null, pM1: "", pM2: "" };
-            
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><b>${p.n}</b></td>
-                <td style="color:#64748b;">${p.grupo}</td>
-                <td style="text-align:left;">
-                    <span style="display:inline-block; width:100px; text-align:right;">${p.eq1}</span>
-                    <span class="vs">vs</span>
-                    <span style="display:inline-block; width:100px; text-align:left;">${p.eq2}</span>
-                </td>
-                <td>
-                    <input type="number" min="0" class="input-marcador input-real" value="${p.r1}" oninput="cambioReal(${p.n}, 1, this.value)">
-                    -
-                    <input type="number" min="0" class="input-marcador input-real" value="${p.r2}" oninput="cambioReal(${p.n}, 2, this.value)">
-                </td>
-                <td>
-                    <button class="btn-toggle" onclick="cambioPronostico(this, ${p.n}, 'L')">L</button>
-                    <button class="btn-toggle" onclick="cambioPronostico(this, ${p.n}, 'E')">E</button>
-                    <button class="btn-toggle" onclick="cambioPronostico(this, ${p.n}, 'V')">V</button>
-                </td>
-                <td>
-                    <input type="number" min="0" class="input-marcador" placeholder="0" oninput="cambioMarcador(${p.n}, 1, this.value)">
-                    -
-                    <input type="number" min="0" class="input-marcador" placeholder="0" oninput="cambioMarcador(${p.n}, 2, this.value)">
-                </td>
-                <td><span class="badge-puntos" id="puntos-${p.n}">0</span></td>
-            `;
-            tbody.appendChild(tr);
-            calcularPuntos(p.n);
-        });
+const PARTICIPANTS = [
+{name:"Joel Andrade", picks:[[1,0],[1,0],[1,0],[1,2],[1,0],[1,0],[0,2],[0,1],[0,3],[1,1],[1,0],[1,1],[0,2],[2,1],[2,1],[0,1],[0,1],[0,1],[1,0],[0,2],[0,1],[0,0],[0,2],[1,0]]},
+{name:"Hector Galarza", picks:[[1,1],[1,0],[2,0],[0,2],[2,0],[1,1],[1,0],[1,2],[1,3],[1,2],[1,0],[2,0],[1,3],[2,1],[1,3],[1,0],[1,2],[1,0],[0,0],[0,4],[1,2],[1,0],[1,3],[3,1]]},
+{name:"Andres Tenempaguay", picks:[[1,2],[2,0],[4,0],[0,2],[1,1],[0,2],[2,1],[0,3],[2,1],[0,2],[2,1],[1,2],[1,1],[2,0],[1,2],[1,1],[0,2],[1,1],[1,1],[0,3],[0,3],[1,1],[1,2],[2,0]]},
+{name:"Johnny Martinez", picks:[[1,2],[2,0],[2,0],[0,3],[1,0],[0,2],[2,0],[0,3],[1,0],[0,2],[3,0],[1,0],[1,2],[2,0],[1,2],[1,0],[0,1],[2,0],[0,1],[0,2],[0,3],[2,1],[1,2],[1,0]]},
+{name:"William Cuñas", picks:[[2,1],[2,1],[2,0],[0,2],[1,0],[1,1],[2,1],[0,3],[1,2],[0,3],[2,1],[0,0],[1,2],[3,1],[0,2],[1,1],[0,2],[1,1],[2,1],[0,3],[3,0],[1,1],[1,2],[1,0]]},
+{name:"Antonina Romero", picks:[[2,1],[1,0],[2,0],[0,2],[1,0],[1,2],[2,1],[0,3],[0,2],[0,2],[1,0],[1,1],[1,2],[2,0],[1,2],[1,1],[0,2],[1,1],[1,1],[0,3],[0,2],[2,1],[1,2],[1,1]]},
+{name:"Israel Fonseca", picks:[[1,1],[1,1],[2,0],[0,2],[1,1],[0,2],[1,0],[1,2],[1,0],[0,2],[1,0],[1,0],[1,1],[1,0],[0,1],[0,1],[0,2],[1,0],[1,0],[0,3],[0,2],[1,0],[1,1],[1,1]]},
+{name:"David Perez", picks:[[2,2],[2,1],[3,0],[0,3],[2,0],[1,2],[1,1],[0,2],[0,4],[0,1],[2,1],[1,1],[1,2],[1,0],[1,2],[1,0],[0,2],[0,1],[0,1],[0,3],[0,3],[2,1],[1,2],[2,0]]},
+{name:"Jose Chavez", picks:[[1,1],[2,0],[4,0],[1,3],[2,0],[1,2],[2,0],[1,3],[0,4],[1,1],[2,1],[2,2],[0,3],[1,1],[2,3],[1,1],[0,2],[2,1],[2,2],[0,4],[1,3],[1,1],[1,3],[1,1]]},
+{name:"Alina Granda", picks:[[1,2],[2,0],[4,0],[1,3],[2,1],[1,1],[2,1],[0,2],[1,1],[1,2],[2,0],[2,1],[0,2],[1,2],[1,3],[1,0],[0,2],[1,1],[1,1],[0,2],[1,3],[2,1],[1,3],[2,1]]},
+{name:"Estefania Vinueza", picks:[[2,1],[1,1],[3,0],[0,2],[2,1],[0,2],[2,1],[0,2],[1,2],[0,2],[2,1],[1,1],[1,2],[2,0],[0,1],[1,1],[0,3],[1,1],[1,2],[0,2],[0,3],[2,1],[1,2],[1,0]]},
+{name:"Kevin Lopez", picks:[[2,2],[2,1],[2,1],[0,3],[1,0],[1,2],[2,1],[0,3],[2,1],[1,3],[3,0],[2,1],[1,3],[2,1],[1,2],[2,0],[1,2],[2,1],[1,1],[3,0],[0,2],[2,1],[1,0],[2,1]]},
+{name:"Bismar Carrion", picks:[[0,1],[0,1],[3,0],[3,0],[1,0],[0,1],[2,0],[0,2],[1,0],[0,3],[3,0],[0,0],[2,3],[0,1],[0,2],[0,2],[0,2],[0,0],[0,1],[0,2],[0,3],[2,0],[1,2],[1,1]]},
+{name:"Jessica Cedeño", picks:[[1,0],[2,1],[2,0],[0,3],[1,0],[1,1],[1,0],[0,3],[1,1],[1,2],[2,1],[1,3],[0,2],[2,0],[1,2],[1,1],[0,1],[0,2],[1,2],[1,3],[0,2],[1,2],[1,2],[1,0]]},
+{name:"Santiago Veintimilla", picks:[[2,1],[2,0],[3,0],[0,3],[2,1],[0,2],[2,1],[0,4],[2,1],[0,3],[2,1],[1,1],[1,2],[2,0],[1,3],[2,1],[1,2],[2,0],[0,2],[0,3],[0,2],[1,0],[1,1],[2,0]]},
+{name:"Carlos Navas", picks:[[1,2],[3,0],[2,0],[0,2],[1,0],[0,1],[1,0],[0,2],[1,0],[0,2],[2,0],[0,2],[0,1],[2,0],[0,1],[1,0],[0,2],[1,0],[0,2],[0,2],[0,2],[0,1],[0,1],[0,0]]},
+{name:"Santiago Armas", picks:[[1,1],[0,0],[3,0],[0,2],[0,0],[1,2],[1,1],[0,4],[0,0],[0,2],[3,0],[1,0],[2,2],[1,0],[1,2],[1,0],[0,2],[1,0],[1,1],[0,2],[0,3],[1,1],[0,1],[2,0]]},
+{name:"Cesar Llano", picks:[[2,1],[2,0],[6,0],[0,2],[1,0],[0,2],[3,1],[4,0],[0,0],[3,0],[2,1],[2,2],[1,2],[3,1],[2,3],[2,0],[1,3],[2,1],[1,2],[1,3],[0,4],[0,1],[2,1],[3,1]]},
+{name:"Paula Kamila Rueda", picks:[[2,2],[2,0],[3,0],[0,2],[2,1],[0,2],[2,1],[0,2],[1,2],[0,2],[2,1],[1,1],[2,2],[2,0],[1,1],[2,1],[0,3],[1,1],[1,1],[0,2],[0,3],[2,0],[1,1],[2,1]]},
+{name:"Alejandro Serrano", picks:[[1,1],[0,0],[1,0],[0,2],[2,0],[1,1],[2,2],[0,2],[1,0],[0,2],[1,2],[1,1],[1,2],[1,1],[1,3],[0,1],[0,1],[1,1],[0,1],[1,2],[1,2],[2,0],[1,2],[1,0]]},
+{name:"Cristina Junco", picks:[[2,1],[2,0],[3,0],[2,1],[1,1],[2,1],[1,1],[2,0],[2,1],[2,0],[2,1],[2,1],[2,1],[2,0],[3,2],[2,1],[3,0],[1,1],[1,1],[3,0],[3,0],[2,1],[3,1],[2,1]]},
+{name:"Shakira Gaibor - Jennifer Dueñas", picks:[[1,1],[2,1],[2,0],[0,2],[2,1],[0,2],[2,2],[0,3],[1,0],[1,1],[2,0],[1,1],[2,2],[1,1],[1,3],[2,1],[1,1],[2,0],[1,1],[0,2],[0,2],[1,0],[1,2],[1,0]]},
+{name:"Daniel Clavijo", picks:[[1,1],[2,0],[3,0],[1,3],[1,1],[0,2],[2,1],[0,2],[0,0],[0,2],[2,0],[1,0],[1,2],[3,0],[1,3],[1,0],[0,2],[2,1],[1,1],[0,2],[0,2],[1,1],[0,2],[2,1]]},
+{name:"Sonia Arteaga", picks:[[1,1],[3,0],[4,0],[1,1],[0,2],[0,3],[1,1],[0,3],[0,3],[0,4],[2,1],[1,1],[1,1],[2,0],[0,2],[3,0],[0,2],[2,0],[1,0],[0,2],[0,3],[2,0],[0,3],[3,0]]},
+{name:"Andrea Chavez", picks:[[1,1],[2,0],[3,0],[1,3],[0,0],[1,2],[1,1],[0,2],[1,0],[1,2],[2,0],[1,0],[1,3],[1,0],[2,1],[2,0],[1,1],[1,2],[0,1],[0,2],[1,3],[2,0],[1,0],[1,0]]},
+];
+
+const real = {};
+let matchRowsHTML = "";
+let lastGroup = "";
+MATCHES.forEach((m, idx) => {
+  if(m.group !== lastGroup){
+    matchRowsHTML += `<div class="group-divider">${m.group}</div>`;
+    lastGroup = m.group;
+  }
+  matchRowsHTML += `
+    <div class="match-row" id="row-${m.n}">
+      <span class="m-num">${m.n}</span>
+      <span class="m-team ${m.special?'special':''}">${m.t1}</span>
+      <span class="score-pair">
+        <input type="number" min="0" max="20" id="s1-${m.n}" data-n="${m.n}" data-side="1">
+        <span>—</span>
+        <input type="number" min="0" max="20" id="s2-${m.n}" data-n="${m.n}" data-side="2">
+      </span>
+      <span class="m-team right ${m.special?'special':''}">${m.t2}</span>
+    </div>`;
+});
+document.getElementById("match-rows").innerHTML = matchRowsHTML;
+
+function outcome(a,b){ return a>b ? "G1" : (a<b ? "G2" : "EM"); }
+
+function computeAll(){
+  let filled = 0;
+  MATCHES.forEach(m=>{
+    const v1 = document.getElementById(`s1-${m.n}`).value;
+    const v2 = document.getElementById(`s2-${m.n}`).value;
+    const row = document.getElementById(`row-${m.n}`);
+    if(v1!=="" && v2!==""){
+      real[m.n] = [parseInt(v1,10), parseInt(v2,10)];
+      row.classList.add("entered");
+      filled++;
+    } else {
+      delete real[m.n];
+      row.classList.remove("entered");
     }
+  });
 
-    function cambioReal(id, eq, valor) {
-        if(eq === 1) registroEvaluacion[id].real1 = valor !== "" ? parseInt(valor) : "";
-        if(eq === 2) registroEvaluacion[id].real2 = valor !== "" ? parseInt(valor) : "";
-        calcularPuntos(id);
-    }
+  const pill = document.getElementById("progress-pill");
+  pill.textContent = `${filled} / 24 ingresados`;
+  pill.classList.toggle("done", filled === 24);
+  document.getElementById("standings-hint").textContent =
+    filled === 0 ? "esperando resultados" : (filled < 24 ? `parcial · ${filled}/24` : "fecha completa");
 
-    function cambioPronostico(btn, id, opcion) {
-        const hermanos = btn.parentNode.children;
-        for(let h of hermanos) h.classList.remove('active');
-        btn.classList.add('active');
-        
-        registroEvaluacion[id].pPronostico = opcion;
-        calcularPuntos(id);
-    }
+  const results = PARTICIPANTS.map(p=>{
+    let outcomePts = 0, scorePts = 0;
+    const perMatch = MATCHES.map((m, i)=>{
+      const pick = p.picks[i];
+      const r = real[m.n];
+      let oc = false, sc = false;
+      if(r){
+        oc = outcome(pick[0],pick[1]) === outcome(r[0],r[1]);
+        sc = pick[0]===r[0] && pick[1]===r[1];
+        if(oc) outcomePts++;
+        if(sc) scorePts++;
+      }
+      return {pick, real:r, oc, sc};
+    });
+    return {name:p.name, outcomePts, scorePts, total:outcomePts+scorePts, perMatch};
+  });
 
-    function cambioMarcador(id, eq, valor) {
-        if(eq === 1) registroEvaluacion[id].pM1 = valor !== "" ? parseInt(valor) : "";
-        if(eq === 2) registroEvaluacion[id].pM2 = valor !== "" ? parseInt(valor) : "";
-        calcularPuntos(id);
-    }
+  results.sort((a,b)=> b.total - a.total || b.scorePts - a.scorePts || a.name.localeCompare(b.name));
 
-    function calcularPuntos(id) {
-        const item = registroEvaluacion[id];
-        let puntosPartida = 0;
+  renderStandings(results);
+  return results;
+}
 
-        if (item.real1 !== "" && item.real2 !== "") {
-            // Determinar signo real
-            let signoReal = 'E';
-            if (item.real1 > item.real2) signoReal = 'L';
-            if (item.real1 < item.real2) signoReal = 'V';
+function renderStandings(results){
+  const list = document.getElementById("standings-list");
+  list.innerHTML = results.map((r, i)=>{
+    const rank = i+1;
+    const cls = rank===1?"top1":rank===2?"top2":rank===3?"top3":"";
+    return `
+      <div class="standing-row ${cls}">
+        <span class="rank">${rank}</span>
+        <span class="pname">${r.name}</span>
+        <span class="pts-mini">${r.outcomePts}</span>
+        <span class="pts-mini">${r.scorePts}</span>
+        <span class="pts-total">${r.total}</span>
+      </div>`;
+  }).join("");
 
-            // 1. Validar Acierto de Tendencia (L/E/V)
-            if (item.pPronostico === signoReal) {
-                puntosPartida += 1;
-            }
+  const select = document.getElementById("detail-select");
+  const current = select.value;
+  select.innerHTML = `<option value="">Selecciona...</option>` +
+    results.map(r=>`<option value="${r.name}">${r.name} — ${r.total} pts</option>`).join("");
+  if(current){ select.value = current; renderDetail(current, results); }
+}
 
-            // 2. Validar Acierto de Marcador Exacto
-            if (item.pM1 !== "" && item.pM2 !== "") {
-                if (item.pM1 === item.real1 && item.pM2 === item.real2) {
-                    puntosPartida += 1;
-                }
-            }
-        }
+function renderDetail(name, results){
+  const body = document.getElementById("detail-body");
+  if(!name){ body.innerHTML = `<div class="empty-detail">Elige un participante para ver partido por partido</div>`; return; }
+  const r = results.find(x=>x.name===name);
+  if(!r){ body.innerHTML = `<div class="empty-detail">Sin datos</div>`; return; }
 
-        document.getElementById(`puntos-${id}`).innerText = puntosPartida;
-        recalcularGranTotal();
-    }
+  const rows = r.perMatch.map((pm, i)=>{
+    const m = MATCHES[i];
+    const realTxt = pm.real ? `${pm.real[0]}-${pm.real[1]}` : "—";
+    return `
+      <tr>
+        <td>${m.n}</td>
+        <td>${m.t1} vs ${m.t2}</td>
+        <td>${pm.pick[0]}-${pm.pick[1]}</td>
+        <td>${realTxt}</td>
+        <td class="${pm.oc?'ok':''}">${pm.real ? (pm.oc?'✓':'✗') : '·'}</td>
+        <td class="${pm.sc?'ok':''}">${pm.real ? (pm.sc?'✓':'✗') : '·'}</td>
+      </tr>`;
+  }).join("");
 
-    function recalcularGranTotal() {
-        let granTotal = 0;
-        partidos.forEach(p => {
-            granTotal += parseInt(document.getElementById(`puntos-${p.n}`).innerText) || 0;
-        });
-        document.getElementById('score-total').innerText = `${granTotal} / 48 Pts`;
-    }
+  body.innerHTML = `
+    <div class="detail-scroll">
+      <table class="detail-table">
+        <thead><tr>
+          <th>#</th><th>Partido</th><th>Pronóstico</th><th>Real</th><th>G/E/P</th><th>Marcador</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
 
-    window.onload = construirTabla;
+document.getElementById("match-rows").addEventListener("input", computeAll);
+document.getElementById("detail-select").addEventListener("change", (e)=>{
+  renderDetail(e.target.value, computeAll());
+});
+
+document.getElementById("btn-demo").addEventListener("click", ()=>{
+  Object.entries(CONFIRMED).forEach(([n, score])=>{
+    document.getElementById(`s1-${n}`).value = score[0];
+    document.getElementById(`s2-${n}`).value = score[1];
+  });
+  computeAll();
+});
+
+document.getElementById("btn-clear").addEventListener("click", ()=>{
+  MATCHES.forEach(m=>{
+    document.getElementById(`s1-${m.n}`).value = "";
+    document.getElementById(`s2-${m.n}`).value = "";
+  });
+  computeAll();
+});
+
+computeAll();
 </script>
-
 </body>
 </html>
