@@ -318,9 +318,7 @@
       <span class="progress-pill" id="progress-pill">0 / 24 ingresados</span>
     </div>
     <div class="match-rows" id="match-rows"></div>
-    <div class="actions-row">
-      <button class="ghost" id="btn-clear">Limpiar todo</button>
-    </div>
+
     <div class="legend-note">
       <b>Puntaje:</b> 1 punto por acertar Gana/Empata/Gana (resultado general) + 1 punto por acertar el marcador exacto. Máximo 2 puntos por partido, 48 en total.
     </div>
@@ -537,14 +535,6 @@ function renderDetail(name, results){
 document.getElementById("match-rows").addEventListener("input", computeAll);
 document.getElementById("detail-select").addEventListener("change", (e)=>{
   renderDetail(e.target.value, computeAll());
-});
-
-document.getElementById("btn-clear").addEventListener("click", ()=>{
-  MATCHES.forEach(m=>{
-    document.getElementById(`s1-${m.n}`).value = "";
-    document.getElementById(`s2-${m.n}`).value = "";
-  });
-  computeAll();
 });
 
 Object.entries(CONFIRMED).forEach(([n, score])=>{
